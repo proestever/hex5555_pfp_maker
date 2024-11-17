@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEX5555 Profile Styler</title>
+    <style>
+        /* Dark theme styling */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        #container {
+            text-align: center;
+            background-color: #1E1E1E;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #styledCanvas {
+            display: block;
+            margin: 20px auto;
+            border: 2px solid #333;
+            border-radius: 10px;
+            background-color: #222;
+        }
+
+        /* Center and style the download button with gradient */
+        #downloadButton {
+            display: none;
+            margin: 20px auto; /* Center horizontally within #container */
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            background-image: url('https://hex.com/downloads/gradient.png'); /* Apply gradient background */
+            background-size: cover;
+        }
+
+        #downloadButton:hover {
+            opacity: 0.9;
+        }
+
+        #logo {
+            display: block;
+            margin: 0 auto 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <!-- Centered Logo -->
+    <a id="logo" href="https://hex5555.win" target="_blank">
+        <img src="https://hex5555.win/assets/images/gallery01/e448ede8.png?v=a01530f9" alt="HEX5555 Logo" width="100">
+    </a>
+
+    <!-- File input and canvas for drawing -->
+    <input type="file" id="imageUpload" accept="image/*">
+    <canvas id="styledCanvas" width="500" height="500"></canvas>
+    <button id="downloadButton">BELIEVE HARDER!</button>
+</div>
+
+<script>
+// Select elements
+const imageUpload = document.getElementById('imageUpload');
+const canvas = document.getElementById('styledCanvas');
+const ctx = canvas.getContext('2d');
+const downloadButton = document.getElementById('downloadButton');
+
+// Set the canvas size to 500x500
+canvas.width = 500;
+canvas.height = 500;
+
+// Load the new overlay image
+const overlayImg = new Image();
+overlayImg.src = 'https://i.ibb.co/2MqnkHP/hexgirloverlay.png'; // New overlay image URL
+overlayImg.crossOrigin = "anonymous";
+overlayImg.onerror = function() {
+    console.error("Overlay image could not be loaded. Please check the file URL.");
+};
+overlayImg.onload = function() {
+    console.log("Overlay image loaded successfully.");
+};
+
+// Handle image upload
+imageUpload.addEventListener('change', handleImageUpload);
+
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    console.log("User uploaded an image file.");
+
+    // Check file type
+    const validTypes = ['image/gif', 'image/png', 'image/jpeg'];
+    if (!validTypes.includes(file.type)) {
+        alert("Please upload a valid image file (GIF, PNG, JPEG).");
+        return;
+    }
+
+    // Load and display the uploaded image
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+            console.log("User image loaded successfully.");
+            drawStyledImage(img);
+            downloadButton.style.display = 'block'; // Show download button
+        };
+        img.onerror = function() {
+            console.error("User image could not be loaded.");
+            alert("An error occurred while loading the image.");
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+// Function to draw the user photo with the new overlay on the main canvas
+function drawStyledImage(userImage) {
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    console.log("Drawing user image and overlay onto the canvas.");
+
+    // Draw the user's uploaded image to fill the entire canvas
+    ctx.drawImage(userImage, 0, 0, canvas.width, canvas.height);
+
+    // Draw the overlay image on top of the user's photo
+    ctx.drawImage(overlayImg, 0, 0, canvas.width, canvas.height);
+}
+
+// Function to download the styled image by copying to an off-screen canvas
+function downloadImage() {
+    // Create an off-screen canvas for downloading
+    const offscreenCanvas = document.createElement('canvas');
+    offscreenCanvas.width = canvas.width;
+    offscreenCanvas.height = canvas.height;
+    const offscreenCtx = offscreenCanvas.getContext('2d');
+
+    // Draw the main canvas content onto the off-screen canvas
+    offscreenCtx.drawImage(canvas, 0, 0);
+
+    // Convert the off-screen canvas to data URL and trigger download
+    const link = document.createElement('a');
+    link.href = offscreenCanvas.toDataURL('image/png'); // Converts canvas to PNG format
+    link.download = 'hex5555_pfp.png'; // Set filename to "hex5555_pfp"
+    document.body.appendChild(link); // Append link to body to make it clickable
+    link.click(); // Simulate a click to trigger the download
+    document.body.removeChild(link); // Clean up by removing the link
+}
+
+// Add the download functionality to the button
+downloadButton.addEventListener('click', downloadImage);
+</script>
+
+</body>
+</html>
